@@ -1,0 +1,27 @@
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+.stop-scroll {
+  overflow: hidden;
+}
+
+.img {
+  background-image: url(../img/map.jpg);
+}
