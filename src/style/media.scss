@@ -35,7 +35,7 @@
 
       &__list {
         grid-template-columns: repeat(2, 1fr);
-        row-gap: 44px;
+        row-gap: 40px;
       }
 
       &__item {
@@ -77,7 +77,7 @@
     .main {
       .form {
         &__list {
-          row-gap: 26px;
+          row-gap: 24px;
         }
 
         &__item {
@@ -90,10 +90,14 @@
           font-size: 14px;
           line-height: 136%;
           margin-bottom: 8px;
+
+          &_result {
+            margin-bottom: 5px;
+          }
         }
 
         &__input {
-          padding: 19px 20px 13px 20px;
+          padding: 18px 20px 13px 20px;
           font-size: 22px;
           line-height: 91%;
 
@@ -114,6 +118,7 @@
         }
 
         &__submit {
+          margin-top: 5px;
           padding: 20px 52px;
           font-size: 22px;
           line-height: 91%;
