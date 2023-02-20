@@ -17,3 +17,10 @@ for (let i = 0; i < inputs.length; ++i) {
   ranges[i].addEventListener('input', () => setRange(ranges[i].value));
   inputs[i].addEventListener('change', () => setRange(inputs[i].value));
 }
+
+ranges.forEach( range => {
+  range.style.setProperty('--value', range.value);
+  range.style.setProperty('--min', range.min == '' ? '0' : range.min);
+  range.style.setProperty('--max', range.max == '' ? '100' : range.max);
+  range.addEventListener('input', () => range.style.setProperty('--value', range.value));
+})
