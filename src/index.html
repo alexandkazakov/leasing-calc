@@ -4,8 +4,60 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Калькулятор стоимости автомобиля в лизинг</title>
+  <link rel="preload" href="./fonts/Gilroy-Regular.woff2" as="font">
+  <link rel="preload" href="./fonts/Gilroy-Regular.woff" as="font">
+  <link rel="preload" href="./fonts/Nekst-Black.woff2" as="font">
+  <link rel="preload" href="./fonts/Nekst-Black.woff" as="font">
 </head>
-<body>
+<body class="body">
+  <header class="header">
+    <div class="container">
+      <h1 class="header__title">Рассчитайте стоимость автомобиля в лизинг</h1>
+    </div>
+  </header>
+  <main class="main">
+    <div class="container">
+      <form class="form">
+        <ul class="form__list">
+          <li class="form__item">
+            <label for="cost" class="form__label">Стоимость автомобиля</label>
+            <div class="form__item_wrap">
+              <input type="text" name="cost" id="cost" class="form__input form__input_cost" value="3 300 000">
+              <span class="form__input_help">₽</span>
+              <input type="range" class="form__range form__range_cost" step="100000" min="1500000" max="10000000" value="5000000">
+            </div>
+          </li>
+          <li class="form__item">
+            <label for="initial-fee" class="form__label">Первоначальный взнос</label>
+            <div class="form__item_wrap">
+              <input type="text" name="initial-fee" id="initial-fee" class="form__input form__input_initial-fee" value="420 000">
+              <span class="form__input_help form__input_help-fee">13%</span>
+              <input type="range" class="form__range form__range_initial-fee" step="100000" min="100000" max="3000000" value="420000">
+            </div>
+          </li>
+          <li class="form__item">
+            <label class="form__label" for="term">Срок лизинга</label>
+            <div class="form__item_wrap">
+              <input type="text" name="term" id="term" class="form__input form__input_term" value="60">
+              <span class="form__input_help">мес.</span>
+              <input type="range" class="form__range form__range_term" step="1" min="6" max="120" value="60">
+            </div>
+          </li>
+          <li class="form__item form__item_result">
+            <label class="form__label" for="cost">Сумма договора лизинга</label>
+            <span class="form__result">4 467 313 ₽</span>
+          </li>
+          <li class="form__item form__item_result">
+            <label class="form__label" for="initial-fee">Ежемесячный платеж от</label>
+            <span class="form__result">114 455 ₽</span>
+          </li>
+          <li class="form__item form__item_btn">
+            <button type="submit" class="btn form__submit">Оставить заявку</button>
+          </li>
+        </ul>
+      </form>
+    </div>
+  </main>
 </body>
 </html>
