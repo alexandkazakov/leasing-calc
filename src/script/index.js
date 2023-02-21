@@ -3,6 +3,7 @@ import 'babel-polyfill';
 import '../index.html';
 import '../style/main.scss';
 
+// инициализируем поле калькулятора
 function calcInit(elemOptions, elemInput, elemRange) {
   elemInput.setAttribute('value', formatValue(elemOptions.value).formatedNumberValue);
   for (let key in elemOptions) {
@@ -10,6 +11,7 @@ function calcInit(elemOptions, elemInput, elemRange) {
   };
 }
 
+// синхронизируем значение input[text] и input[range]
 function syncInputWithRange(input, range) {
   // устанавливаем правильные значения в input и range
   function setRange(value) {
@@ -53,6 +55,7 @@ function updateRange(range) {
   range.addEventListener('input', () => range.style.setProperty('--value', range.value));
 }
 
+// обновляем значение initial-fee относительно новых значений cost
 function updateFeeValues(feeOptions, costInputValue, feeInput, feeRange) {
   // устанавливаем новые значения: min, max, value у второго поля
   feeOptions.min = (costInputValue.replace(/\s*/g, '') * 0.1);
@@ -61,11 +64,38 @@ function updateFeeValues(feeOptions, costInputValue, feeInput, feeRange) {
 
   calcInit(feeOptions, feeInput, feeRange); // обновляем значения feeInput и feeRange
   updateRange(feeRange); // синхронищируем линию прогресса
+  updateRate(costInputValue, feeInput.value); // обновляем ставку
+}
+
+function updateRate(costValue, feeValue) {
+  const rateElem = document.querySelector('.form__input_help-fee');
+  rateElem.textContent = Math.floor(formatValue(feeValue).numberValue / formatValue(costValue).numberValue * 100) + '%';
+}
+
+function updateResults(costValue, feeValue, termValue) {
+  const sumElem = document.querySelector('.form__result_sum');
+  const paymentElem = document.querySelector('.form__result_payment');
+
+  costValue = formatValue(costValue).numberValue;
+  feeValue = formatValue(feeValue).numberValue;
+  termValue = formatValue(termValue).numberValue;
+
+  const paymentValue = Math.round((costValue - feeValue) * (0.05 * Math.pow((1 + 0.05), termValue) / (Math.pow((1 + 0.05), termValue) - 1)));
+  const sumValue = Math.round(+feeValue + (paymentValue * +termValue));
+
+  paymentElem.textContent = formatValue(paymentValue).formatedNumberValue + ' ₽';
+  sumElem.textContent = formatValue(sumValue).formatedNumberValue + ' ₽';
+
+  return {
+    paymentValue,
+    sumValue
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const inputs = document.querySelectorAll('.form__input');
   const ranges = document.querySelectorAll('.form__range');
+  const form = document.querySelector('.form');
 
   const options = [];
 
@@ -93,10 +123,30 @@ document.addEventListener('DOMContentLoaded', () => {
   for (let i = 0; i < inputs.length; ++i) {
     calcInit(options[i], inputs[i], ranges[i]); // инициализируем калькулятор для каждого input
     syncInputWithRange(inputs[i], ranges[i]); // синхронизируем каждый input[text] со своим input[range]
+    updateResults(inputs[0].value, inputs[1].value, inputs[2].value); // обновляем значения результатов до актуальных
+
+    ranges[i].addEventListener('input', () => updateResults(inputs[0].value, inputs[1].value, inputs[2].value)); // следим за обновлением результатов по изменению range
+    inputs[i].addEventListener('input', () => updateResults(inputs[0].value, inputs[1].value, inputs[2].value)); // следим за обновлением результатов по изменению range
   };
 
   // обновляем значения initial-fee относительно новых значений cost
   ranges[0].addEventListener('change', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1]));
+  inputs[0].addEventListener('input', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1]));
 
+  ranges[1].addEventListener('input', () => updateRate(inputs[0].value, inputs[1].value)); // обновляем ставку относительно новых значений
   ranges.forEach(range => updateRange(range)); // синхронизируем линию прогресса ползунка с ползунком
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const result = {
+      cost: inputs[0].value,
+      fee: inputs[1].value,
+      term: inputs[2].value,
+      sum: updateResults(inputs[0].value, inputs[1].value, inputs[2].value).sumValue,
+      payment: updateResults(inputs[0].value, inputs[1].value, inputs[2].value).paymentValue
+    };
+
+    alert( JSON.stringify(result) );
+  })
 })
