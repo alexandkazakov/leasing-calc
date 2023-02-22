@@ -9,6 +9,9 @@ function calcInit(elemOptions, elemInput, elemRange) {
   for (let key in elemOptions) {
     elemRange.setAttribute(key, elemOptions[key]);
   };
+  // обновляем значения полей
+  elemInput.value = formatValue(elemOptions.value).formatedNumberValue;
+  elemRange.value = elemOptions.value;
 }
 
 // синхронизируем значение input[text] и input[range]
@@ -56,7 +59,7 @@ function updateRange(range) {
 }
 
 // обновляем значение initial-fee относительно новых значений cost
-function updateFeeValues(feeOptions, costInputValue, feeInput, feeRange) {
+function updateFeeValues(feeOptions, costInputValue, feeInput, feeRange, termInputValue) {
   // устанавливаем новые значения: min, max, value у второго поля
   feeOptions.min = (costInputValue.replace(/\s*/g, '') * 0.1);
   feeOptions.max = (costInputValue.replace(/\s*/g, '') * 0.6);
@@ -65,6 +68,7 @@ function updateFeeValues(feeOptions, costInputValue, feeInput, feeRange) {
   calcInit(feeOptions, feeInput, feeRange); // обновляем значения feeInput и feeRange
   updateRange(feeRange); // синхронищируем линию прогресса
   updateRate(costInputValue, feeInput.value); // обновляем ставку
+  updateResults(costInputValue, feeInput.value, termInputValue); // обновляем результаты относительно новых значений
 }
 
 function updateRate(costValue, feeValue) {
@@ -96,6 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputs = document.querySelectorAll('.form__input');
   const ranges = document.querySelectorAll('.form__range');
   const form = document.querySelector('.form');
+  const formInputHelps = document.querySelectorAll('.form__input_help');
+  const formSubmitBtn = document.querySelector('.form__submit');
 
   const options = [];
 
@@ -126,12 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
     updateResults(inputs[0].value, inputs[1].value, inputs[2].value); // обновляем значения результатов до актуальных
 
     ranges[i].addEventListener('input', () => updateResults(inputs[0].value, inputs[1].value, inputs[2].value)); // следим за обновлением результатов по изменению range
-    inputs[i].addEventListener('input', () => updateResults(inputs[0].value, inputs[1].value, inputs[2].value)); // следим за обновлением результатов по изменению range
+    inputs[i].addEventListener('input', () => updateResults(inputs[0].value, inputs[1].value, inputs[2].value)); // следим за обновлением результатов по изменению input
   };
 
   // обновляем значения initial-fee относительно новых значений cost
-  ranges[0].addEventListener('change', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1]));
-  inputs[0].addEventListener('input', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1]));
+  ranges[0].addEventListener('input', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1], inputs[2].value));
+  inputs[0].addEventListener('input', () => updateFeeValues(options[1], inputs[0].value, inputs[1], ranges[1], inputs[2].value));
 
   ranges[1].addEventListener('input', () => updateRate(inputs[0].value, inputs[1].value)); // обновляем ставку относительно новых значений
   ranges.forEach(range => updateRange(range)); // синхронизируем линию прогресса ползунка с ползунком
@@ -139,14 +145,30 @@ document.addEventListener('DOMContentLoaded', () => {
   form.addEventListener('submit', event => {
     event.preventDefault();
 
+    // деактивируем форму
+    inputs.forEach(input => {
+      input.setAttribute('disabled', true);
+    });
+    ranges.forEach(range => {
+      range.setAttribute('disabled', true);
+    });
+    formInputHelps.forEach(elem => {
+      elem.classList.add('disabled');
+    });
+    formSubmitBtn.setAttribute('disabled', true);
+
+    // формируем результат
     const result = {
-      cost: inputs[0].value,
-      fee: inputs[1].value,
-      term: inputs[2].value,
+      cost: formatValue(inputs[0].value).numberValue,
+      fee: formatValue(inputs[1].value).numberValue,
+      term: formatValue(inputs[2].value).numberValue,
       sum: updateResults(inputs[0].value, inputs[1].value, inputs[2].value).sumValue,
       payment: updateResults(inputs[0].value, inputs[1].value, inputs[2].value).paymentValue
     };
 
-    alert( JSON.stringify(result) );
+    // выводим его на экран в виде JSON
+    setTimeout(() => {
+      alert( JSON.stringify(result) );
+    }, 100);
   })
 })
